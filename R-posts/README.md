@@ -25,7 +25,7 @@
 
 <h1 align="left">🦋 bsky posts about R programming 💻</h1>
 
-<a href="https://javieralvarezliebana.es/bsky/R-posts"><img width = "900" src="https://github.com/user-attachments/assets/fe328a79-d1c5-4edc-a12a-5e7c5b1c1915">
+<a href="https://javieralvarezliebana.es/bsky/R-posts"><img width = "750" src="https://github.com/user-attachments/assets/fe328a79-d1c5-4edc-a12a-5e7c5b1c1915">
 
 | Bsky post | About | Slides | Material |
 |:----------------:|:-------------------:|:--------:|:--------:|
