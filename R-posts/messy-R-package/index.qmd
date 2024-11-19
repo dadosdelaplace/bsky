@@ -1,0 +1,132 @@
+---
+title: "`{messy}` package"
+subtitle: "Estropeando adrede datasets.\n Deliberately messing up datasets"
+format:
+  revealjs:
+    theme: [style.scss]
+    menu:
+      side: left
+      width: normal
+    footer: "[<strong>Javier Álvarez Liébana</strong>](https://bsky.app/profile/dadosdelaplace.bsky.social) • @dadosdelaplace • dadosdelaplace.bsky.social"
+    slide-number: c/t
+execute:
+  echo: true
+---
+
+## {messy} package
+
+
+El paquete `{messy}` (de Nicola Rennie) nos permite como **docentes** poder **«ensuciar» bases de datos** con el objetivo de que practicar con datasets defectuosos. También puede ser útil para **desarrolladores de software** (como beta-tester).
+
+&nbsp;
+
+The `{messy}` package (by Nicola Rennie) allows us as **teachers** to **«mess up» datasets**. It can also be useful for **software developers** (as beta testers).
+
+
+&nbsp;
+
+```{r}
+# devtools::install_github("nrennie/messy")
+library(messy)
+```
+
+
+---
+
+## Practice with starwars
+
+
+:::: columns
+::: {.column width="50%"}
+
+Vamos practicar usando algunas filas y columnas del dataset starwars (`{dplyr}`).
+
+:::
+
+::: {.column width="50%"}
+
+For practice, we will use some rows and columns from the starwars dataset (`{dplyr}`).
+
+:::
+
+::::
+
+```{r}
+library(dplyr)
+data <- starwars[1:7, c("name", "height", "mass", "eye_color")]
+data
+```
+
+---
+
+## Randomly missings
+
+```{r}
+data |> 
+  make_missing(cols = c("name", "mass"), messiness = 0.3, missing = NA)
+```
+
+---
+
+
+## Switch title/lowercase
+
+```{r}
+data |> 
+  change_case(cols = c("name", "eye_color"), messiness = 0.3,
+              case_type = "letter") # or case_type = "word"
+```
+
+
+
+---
+
+## Add special characters
+
+```{r}
+data |> 
+  add_special_chars(cols = c("name", "eye_color"), messiness = 0.1)
+```
+
+---
+
+## Add white spaces
+
+```{r}
+data |> 
+  add_whitespace(cols = c("name", "eye_color"), messiness = 0.5)
+```
+
+---
+
+## Messy: in general
+
+```{r}
+data |> 
+  messy(messiness = 0.1, missing = NA, case_type = "letter")
+```
+
+---
+
+## Messy variable names
+
+```{r}
+data |> 
+  messy_colnames(messiness = 0.2)
+```
+
+---
+
+## Summary
+
+```{r}
+data |> 
+  make_missing(cols = c("name", "eye_color"), missing = " ",
+               messiness = 0.2) |> 
+  make_missing(cols = c("height", "mass"), missing = NA,
+               messiness = 0.2) |> 
+  add_whitespace(cols = "name", messiness = 0.1) |> 
+  add_special_chars(cols = c("name", "eye_color"), messiness = 0.1) |> 
+  messy_colnames(messiness = 0.2)
+```
+
