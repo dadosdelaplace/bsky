@@ -436,25 +436,39 @@
 </section>
 <section id="randomly-missings" class="slide level2">
 <h2>Randomly missings</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><code>make_missing()</code> nos permite introducir ausentes (como <code>missing = ...</code>) en las columnas <code>cols</code>. El parámetro <code>messiness</code> mide la probabilidad de cambio.</p>
+</div><div class="column" style="width:50%;">
+<p><code>make_missing()</code> allows us to introduce missing values (as <code>missing = ...</code>) in <code>cols</code> columns. <code>messiness</code> parameter measures the probablity to be changed.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>data <span class="sc">|&gt;</span> </span>
 <span id="cb4-2"><a href="#cb4-2"></a>  <span class="fu">make_missing</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"name"</span>, <span class="st">"mass"</span>), <span class="at">messiness =</span> <span class="fl">0.3</span>, <span class="at">missing =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 7 × 4
-  name           height  mass eye_color
-  &lt;chr&gt;           &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    
-1 Luke Skywalker    172    NA blue     
-2 C-3PO             167    NA yellow   
-3 R2-D2              96    32 red      
-4 Darth Vader       202    NA yellow   
-5 &lt;NA&gt;              150    49 brown    
-6 Owen Lars         178    NA blue     
-7 &lt;NA&gt;              165    NA blue     </code></pre>
+  name               height  mass eye_color
+  &lt;chr&gt;               &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    
+1 Luke Skywalker        172    77 blue     
+2 &lt;NA&gt;                  167    75 yellow   
+3 R2-D2                  96    NA red      
+4 Darth Vader           202   136 yellow   
+5 Leia Organa           150    49 brown    
+6 &lt;NA&gt;                  178   120 blue     
+7 Beru Whitesun Lars    165    NA blue     </code></pre>
 </div>
 </div>
 </section>
 <section id="switch-titlelowercase" class="slide level2">
 <h2>Switch title/lowercase</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><code>change_case()</code> nos permite intercambiar mayúsculas y minúsculas en variables de texto de manera aleatoria (por palabras o letras según <code>case_type</code>).</p>
+</div><div class="column" style="width:50%;">
+<p><code>change_case()</code> allows us randomly switch between title case and lowercase (by words or letters according to <code>case_type</code>) for character variables.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>data <span class="sc">|&gt;</span> </span>
 <span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">change_case</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"name"</span>, <span class="st">"eye_color"</span>), <span class="at">messiness =</span> <span class="fl">0.3</span>,</span>
@@ -463,114 +477,123 @@
 <pre><code># A tibble: 7 × 4
   name               height  mass eye_color
   &lt;chr&gt;               &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    
-1 Luke skYWAlkER        172    77 blUE     
-2 C-3pO                 167    75 YEllow   
-3 r2-d2                  96    32 rED      
-4 DARTh VAder           202   136 yEllow   
-5 leia orgAna           150    49 bROwn    
-6 owen LArs             178   120 blue     
-7 bEru whitEsUn LaRs    165    75 Blue     </code></pre>
+1 luke sKyWaLKEr        172    77 blue     
+2 c-3pO                 167    75 YelloW   
+3 R2-d2                  96    32 rEd      
+4 dARTH VadeR           202   136 YeLlow   
+5 lEIa orgaNa           150    49 bRoWn    
+6 oweN laRS             178   120 blUe     
+7 beru WhiteSUn LaRs    165    75 bluE     </code></pre>
 </div>
 </div>
 </section>
 <section id="add-special-characters" class="slide level2">
 <h2>Add special characters</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><code>add_special_chars()</code> nos permite añadir caracteres especiales (*, $, !, ?, ^, etc) en variables de texto.</p>
+</div><div class="column" style="width:50%;">
+<p><code>add_special_chars()</code> allows us to introduce special characters (*, $, !, ?, ^, etc) into character variables.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>data <span class="sc">|&gt;</span> </span>
 <span id="cb8-2"><a href="#cb8-2"></a>  <span class="fu">add_special_chars</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"name"</span>, <span class="st">"eye_color"</span>), <span class="at">messiness =</span> <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 7 × 4
-  name                  height  mass eye_color
-  &lt;chr&gt;                  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    
-1 Luke Skywalker           172    77 blue     
-2 C-3PO                    167    75 ye(llow  
-3 R2-D$2                    96    32 red      
-4 Darth Vader              202   136 yellow   
-5 !Leia Organa             150    49 br*own   
-6 Owen )Lars               178   120 b^lue    
-7 Be@ru Whi(tes&amp;un Lars    165    75 blue     </code></pre>
+  name               height  mass eye_color
+  &lt;chr&gt;               &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    
+1 Luk#e Skywalke@r      172    77 blue     
+2 C-3#PO                167    75 yellow   
+3 R2_-D2                 96    32 red      
+4 Darth V&amp;ad+er         202   136 yellow   
+5 Leia Organa           150    49 bro@wn   
+6 Owen Lars             178   120 blu^e    
+7 Beru Whitesun Lars    165    75 blue     </code></pre>
 </div>
 </div>
 </section>
 <section id="add-white-spaces" class="slide level2">
 <h2>Add white spaces</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><code>add_whitespace()</code> nos permite introducir espacios en blanco en variables de texto .</p>
+</div><div class="column" style="width:50%;">
+<p><code>add_whitespace()</code> allows us to introduce white spaces into character variables .</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>data <span class="sc">|&gt;</span> </span>
 <span id="cb10-2"><a href="#cb10-2"></a>  <span class="fu">add_whitespace</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"name"</span>, <span class="st">"eye_color"</span>), <span class="at">messiness =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 7 × 4
-  name                  height  mass eye_color
-  &lt;chr&gt;                  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    
-1 "Luke Skywalker"         172    77 "blue "  
-2 "C-3PO"                  167    75 "yellow" 
-3 "R2-D2 "                  96    32 "red "   
-4 "Darth Vader "           202   136 "yellow" 
-5 "Leia Organa "           150    49 "brown"  
-6 "Owen Lars"              178   120 "blue "  
-7 "Beru Whitesun Lars "    165    75 "blue "  </code></pre>
-</div>
-</div>
-</section>
-<section id="messy-in-general" class="slide level2">
-<h2>Messy: in general</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>data <span class="sc">|&gt;</span> </span>
-<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">messy</span>(<span class="at">messiness =</span> <span class="fl">0.1</span>, <span class="at">missing =</span> <span class="cn">NA</span>, <span class="at">case_type =</span> <span class="st">"letter"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 7 × 4
-  name                  height mass  eye_color
-  &lt;chr&gt;                 &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;    
-1 "Luke@ s.kyWalker "   172    77    b_lue    
-2 "NA"                  167    75    yell.ow  
-3 "r2-d2"               96     32    red      
-4 "Dart)h vAder"        NA     136   &amp;yellow  
-5 "leia organa"         150    49    brown    
-6 "owen lars"           NA     120   blue     
-7 "bERu whites#un lars" 165    75    blue     </code></pre>
+  name                 height  mass eye_color
+  &lt;chr&gt;                 &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    
+1 "Luke Skywalker"        172    77 "blue "  
+2 "C-3PO"                 167    75 "yellow" 
+3 "R2-D2 "                 96    32 "red"    
+4 "Darth Vader"           202   136 "yellow "
+5 "Leia Organa"           150    49 "brown " 
+6 "Owen Lars "            178   120 "blue"   
+7 "Beru Whitesun Lars"    165    75 "blue "  </code></pre>
 </div>
 </div>
 </section>
 <section id="messy-variable-names" class="slide level2">
 <h2>Messy variable names</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><code>messy_colnames()</code> nos permite añadir caracteres especiales y mayúsculas en nombres de variables.</p>
+</div><div class="column" style="width:50%;">
+<p><code>messy_colnames()</code> allows us to adds randomly special characters and capitalises in column names.</p>
+</div>
+</div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>data <span class="sc">|&gt;</span> </span>
-<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">messy_colnames</span>(<span class="at">messiness =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>data <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">messy_colnames</span>(<span class="at">messiness =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 7 × 4
-  `n)ame `           `he&amp;ight`  mass `ey@e_col&amp;or`
-  &lt;chr&gt;                  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;        
-1 Luke Skywalker           172    77 blue         
-2 C-3PO                    167    75 yellow       
-3 R2-D2                     96    32 red          
-4 Darth Vader              202   136 yellow       
-5 Leia Organa              150    49 brown        
-6 Owen Lars                178   120 blue         
-7 Beru Whitesun Lars       165    75 blue         </code></pre>
+  `na-me`            `heigh%t` `ma(ss` `eye_co%lo)r`
+  &lt;chr&gt;                  &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;        
+1 Luke Skywalker           172      77 blue         
+2 C-3PO                    167      75 yellow       
+3 R2-D2                     96      32 red          
+4 Darth Vader              202     136 yellow       
+5 Leia Organa              150      49 brown        
+6 Owen Lars                178     120 blue         
+7 Beru Whitesun Lars       165      75 blue         </code></pre>
 </div>
 </div>
 </section>
-<section id="summary" class="slide level2">
-<h2>Summary</h2>
+<section id="in-summary" class="slide level2">
+<h2>In summary</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Podemos combinar todo lo anterior con pipes. Puedes ver toda la info en <a href="https://nrennie.rbind.io/messy/" class="uri">https://nrennie.rbind.io/messy/</a></p>
+</div><div class="column" style="width:50%;">
+<p>We can combine all actions using pipes. You can check all at <a href="https://nrennie.rbind.io/messy/" class="uri">https://nrennie.rbind.io/messy/</a></p>
+</div>
+</div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>data <span class="sc">|&gt;</span> </span>
-<span id="cb16-2"><a href="#cb16-2"></a>  <span class="fu">make_missing</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"name"</span>, <span class="st">"eye_color"</span>), <span class="at">missing =</span> <span class="st">" "</span>,</span>
-<span id="cb16-3"><a href="#cb16-3"></a>               <span class="at">messiness =</span> <span class="fl">0.2</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb16-4"><a href="#cb16-4"></a>  <span class="fu">make_missing</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"height"</span>, <span class="st">"mass"</span>), <span class="at">missing =</span> <span class="cn">NA</span>,</span>
-<span id="cb16-5"><a href="#cb16-5"></a>               <span class="at">messiness =</span> <span class="fl">0.2</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb16-6"><a href="#cb16-6"></a>  <span class="fu">add_whitespace</span>(<span class="at">cols =</span> <span class="st">"name"</span>, <span class="at">messiness =</span> <span class="fl">0.1</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb16-7"><a href="#cb16-7"></a>  <span class="fu">add_special_chars</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"name"</span>, <span class="st">"eye_color"</span>), <span class="at">messiness =</span> <span class="fl">0.1</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb16-8"><a href="#cb16-8"></a>  <span class="fu">messy_colnames</span>(<span class="at">messiness =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>data <span class="sc">|&gt;</span> </span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">make_missing</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"name"</span>, <span class="st">"eye_color"</span>), <span class="at">missing =</span> <span class="st">" "</span>,</span>
+<span id="cb14-3"><a href="#cb14-3"></a>               <span class="at">messiness =</span> <span class="fl">0.2</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4"></a>  <span class="fu">make_missing</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"height"</span>, <span class="st">"mass"</span>), <span class="at">missing =</span> <span class="cn">NA</span>,</span>
+<span id="cb14-5"><a href="#cb14-5"></a>               <span class="at">messiness =</span> <span class="fl">0.2</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-6"><a href="#cb14-6"></a>  <span class="fu">add_whitespace</span>(<span class="at">cols =</span> <span class="st">"name"</span>, <span class="at">messiness =</span> <span class="fl">0.1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-7"><a href="#cb14-7"></a>  <span class="fu">add_special_chars</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"name"</span>, <span class="st">"eye_color"</span>), <span class="at">messiness =</span> <span class="fl">0.1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-8"><a href="#cb14-8"></a>  <span class="fu">messy_colnames</span>(<span class="at">messiness =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 7 × 4
-  .name                 `heigh!t`  mass `_e+ye_color`
-  &lt;chr&gt;                     &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;        
-1 " "                         172    77 "blue"       
-2 " "                         167    75 "! "         
-3 "R2-D2"                      NA    NA "re.d"       
-4 "Dar)th Vader"              202   136 "yel-low"    
-5 " "                         150    49 "brown"      
-6 "Owen Lars"                 178   120 "blue"       
-7 "Beru Whitesun -Lars"       165    75 "blu_e"      </code></pre>
+  `#name`          `HEIGHT `  MASS `eye+_co$lor`
+  &lt;chr&gt;                &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;        
+1 "Luke Skywalker"       172    77 " "          
+2 "C-3PO"                 NA    75 "yellow"     
+3 "R2-(D2"                96    NA "red"        
+4 "Darth Vade*r"         202   136 "^yellow"    
+5 "Leia $Organ.a"        150    49 "brown"      
+6 "# "                   178   120 "blue"       
+7 "  "                   165    75 "blue"       </code></pre>
 </div>
 </div>
 <div class="footer footer-default">

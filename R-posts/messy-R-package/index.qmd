@@ -61,6 +61,21 @@ data
 
 ## Randomly missings
 
+
+:::: columns
+::: {.column width="50%"}
+
+`make_missing()` nos permite introducir ausentes (como `missing = ...`) en las columnas `cols`. El parámetro `messiness` mide la probabilidad de cambio.
+
+:::
+
+::: {.column width="50%"}
+
+`make_missing()` allows us to introduce missing values (as `missing = ...`) in `cols` columns. `messiness` parameter measures the probablity to be changed.
+
+:::
+::::
+
 ```{r}
 data |> 
   make_missing(cols = c("name", "mass"), messiness = 0.3, missing = NA)
@@ -70,6 +85,19 @@ data |>
 
 
 ## Switch title/lowercase
+
+:::: columns
+::: {.column width="50%"}
+
+`change_case()` nos permite intercambiar mayúsculas y minúsculas en variables de texto de manera aleatoria (por palabras o letras según `case_type`).
+:::
+
+::: {.column width="50%"}
+
+`change_case()` allows us randomly switch between title case and lowercase (by words or letters according to `case_type`) for character variables.
+
+:::
+::::
 
 ```{r}
 data |> 
@@ -83,6 +111,20 @@ data |>
 
 ## Add special characters
 
+:::: columns
+::: {.column width="50%"}
+
+`add_special_chars()` nos permite añadir caracteres especiales (*, $, !, ?, ^, etc) en variables de texto.
+
+:::
+
+::: {.column width="50%"}
+
+`add_special_chars()` allows us to introduce special characters (*, $, !, ?, ^, etc) into character variables.
+
+:::
+::::
+
 ```{r}
 data |> 
   add_special_chars(cols = c("name", "eye_color"), messiness = 0.1)
@@ -92,24 +134,43 @@ data |>
 
 ## Add white spaces
 
+:::: columns
+::: {.column width="50%"}
+
+`add_whitespace()` nos permite introducir espacios en blanco en variables de texto .
+
+:::
+
+::: {.column width="50%"}
+
+`add_whitespace()` allows us to introduce white spaces into character variables .
+
+:::
+::::
+
 ```{r}
 data |> 
   add_whitespace(cols = c("name", "eye_color"), messiness = 0.5)
 ```
 
----
-
-## Messy: in general
-
-```{r}
-data |> 
-  messy(messiness = 0.1, missing = NA, case_type = "letter")
-```
 
 ---
 
 ## Messy variable names
 
+:::: columns
+::: {.column width="50%"}
+
+`messy_colnames()` nos permite añadir caracteres especiales y mayúsculas en nombres de variables.
+
+:::
+
+::: {.column width="50%"}
+
+`messy_colnames()` allows us to adds randomly special characters and  capitalises in column names.
+
+:::
+::::
 ```{r}
 data |> 
   messy_colnames(messiness = 0.2)
@@ -117,7 +178,21 @@ data |>
 
 ---
 
-## Summary
+## In summary
+
+:::: columns
+::: {.column width="50%"}
+
+Podemos combinar todo lo anterior con pipes. Puedes ver toda la info en <https://nrennie.rbind.io/messy/>
+
+:::
+
+::: {.column width="50%"}
+
+We can combine all actions using pipes. You can check all at <https://nrennie.rbind.io/messy/>
+
+:::
+::::
 
 ```{r}
 data |> 
