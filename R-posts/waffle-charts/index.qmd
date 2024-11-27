@@ -1,0 +1,424 @@
+---
+title: "`{waffle}` package"
+subtitle: "Cocinando gráficos.\n Cooking dataviz"
+format:
+  revealjs:
+    theme: [style.scss]
+    menu:
+      side: left
+      width: normal
+    footer: "[<strong>Javier Álvarez Liébana</strong>](https://bsky.app/profile/dadosdelaplace.bsky.social) • @dadosdelaplace • dadosdelaplace.bsky.social"
+    slide-number: c/t
+execute:
+  echo: true
+---
+
+## Dataviz: cualitative variables
+
+:::: columns
+::: {.column width="50%"}
+
+Hacer [**gráficos con variables cualitativas**]{.hl-green} puede ser complicado más allá de los diagramas de barras. 
+
+:::
+
+::: {.column width="50%"}
+
+Creating [**vizs with qualitative variables**]{.hl-green} can be tricky beyond bar graphs.
+
+:::
+::::
+
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| message: false
+#| fig-align: "center"
+library(tidyverse)
+data <-
+  CDR::accidentes2020_data |>
+  as_tibble() |> 
+  mutate("fecha" = dmy(fecha),
+         "sexo" = factor(sexo, levels = c("Desconocido", "Hombre", "Mujer"),
+                         labels = c("Unknown", "Male", "Female")))
+
+extrafont::loadfonts()
+theme_gg <-
+  theme_minimal(base_family = "Rockwell") +
+  theme(legend.position = "bottom", legend.title = element_blank(),
+        legend.text = element_text(size = 15, color = "grey20"),
+        plot.title = element_text(size = 21, face = "bold"),
+        axis.text = element_text(size = 13, color = "grey50"),
+        axis.title = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
+
+ggplot(data) +
+  geom_bar(aes(x = sexo, fill = sexo), alpha = 0.6) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  guides(fill = "none") +
+  labs(title = "Road accidents in Madrid in 2020",
+       x = "Sex", y = "Absolute frecuency", fill = "sex",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: {CDR} package") +
+  theme_gg
+```
+
+
+---
+
+## Pie chart: a cake problem
+
+:::: columns
+::: {.column width="50%"}
+
+Y por desgracia... es habitual acudir a los [**diagramas de tartas**]{.hl-orange}.
+
+:::
+
+::: {.column width="50%"}
+
+And sadly... [**pie charts**]{.hl-orange} are often the go-to choice.
+
+:::
+::::
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+ggplot(data |> count(sexo)) +
+  geom_bar(aes(x = "", y = n, fill = sexo), stat = "identity", alpha = 0.6) +
+  coord_polar(theta = "y", start = 0) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  labs(title = "Road accidents in Madrid in 2020",
+       fill = "sex",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: {CDR} package") +
+  theme_gg +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank())
+```
+
+---
+
+## Pie chart: a cake problem
+
+:::: columns
+::: {.column width="50%"}
+
+¿Problema? Con nuestros ojos [**no podemos comparar bien ángulos**]{.hl-orange}
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+#| fig-width: 5.8
+example_1 <-
+  tibble(group = LETTERS[1:6], 
+         n = c(16, 14, 6, 9, 39, 5))
+
+gg1 <-
+  ggplot(example_1) +
+  geom_bar(aes(x = "", y = n, fill = group), stat = "identity", alpha = 0.6) +
+  coord_polar(theta = "y", start = 0) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  labs(fill = "group") +
+  theme_gg +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank())
+gg2 <-
+  ggplot(example_1) +
+  geom_col(aes(x = group, y = n, fill = group), alpha = 0.6) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  scale_y_continuous(breaks = seq(0, 40, by = 5)) +
+  labs(fill = "group") +
+  theme_gg +
+  theme(axis.title.x = element_blank())
+library(patchwork)
+(gg1 / gg2) + 
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom",
+        plot.margin = margin(0, 0, 0, 0))
+```
+
+:::
+
+::: {.column width="50%"}
+
+The issue? Our eyes [**aren’t great at comparing angles**]{.hl-orange}
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+#| fig-width: 5.8
+example_2 <-
+  tibble(group = LETTERS[1:6], 
+         n = c(14, 16, 5, 7, 39, 6))
+gg1 <-
+  ggplot(example_2) +
+  geom_bar(aes(x = "", y = n, fill = group), stat = "identity", alpha = 0.6) +
+  coord_polar(theta = "y", start = 0) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  labs(fill = "group") +
+  theme_gg +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank())
+gg2 <-
+  ggplot(example_2) +
+  geom_col(aes(x = group, y = n, fill = group), alpha = 0.6) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  scale_y_continuous(breaks = seq(0, 40, by = 5)) +
+  labs(fill = "group") +
+  theme_gg +
+  theme(axis.title.x = element_blank())
+
+(gg1 / gg2) + 
+  plot_layout(guides = "collect") &
+  theme(legend.position = "bottom",
+        plot.margin = margin(0, 0, 0, 0))
+
+```
+
+:::
+::::
+
+
+
+
+---
+
+## Waffle charts: a sweet solution
+
+
+:::: columns
+::: {.column width="50%"}
+
+El paquete `{waffle}` nos permite realizar [**gráficos de gofre**]{.hl-green}: cada cuadrado representa un dato.
+
+:::
+
+::: {.column width="50%"}
+
+The `{waffle}` package allows us to create [**waffle charts**]{.hl-green}: each square represents a data point.
+
+:::
+::::
+
+:::: columns
+::: {.column width="53%"}
+
+```{r}
+#| code-line-numbers: "3-6"
+#| eval: false
+# install.packages("waffle")
+library(waffle)
+ggplot(example_1) +
+  geom_waffle(aes(fill = group, values = n),
+              color = "grey90", size = 0.2,
+              n_rows = 5, alpha = 0.7) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  coord_equal() +
+  scale_x_continuous(labels = function(x) x * 5 ) + 
+  labs(fill = "Group",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social") +
+  theme_gg +
+  theme(axis.text.y = element_blank())
+```
+
+:::
+
+
+::: {.column width="47%"}
+
+```{r}
+#| echo: false
+library(waffle)
+ggplot(example_1) +
+  geom_waffle(aes(fill = group, values = n),
+              color = "grey90", size = 0.2,
+              n_rows = 5, alpha = 0.7) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  coord_equal() +
+  scale_x_continuous(labels = function(x) x * 5 ) + 
+  labs(fill = "Group",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social") +
+  theme_gg +
+  theme(axis.text.y = element_blank())
+```
+:::
+::::
+
+---
+
+
+## Waffle charts: a sweet solution
+
+:::: columns
+::: {.column width="50%"}
+
+`make_proportional = TRUE` nos permite asociar a cada cuadrado el **1% de los datos**.
+
+:::
+
+::: {.column width="50%"}
+
+`make_proportional = TRUE` allows us to associate to **each square the 1% of data (relative mode)**.
+
+:::
+::::
+
+```{r}
+#| fig-align: "center"
+#| code-fold: true
+ggplot(data |> count(sexo)) +
+  geom_waffle(aes(fill = sexo, values = n),
+              alpha = 0.7, color = "grey90", size = 0.2,
+              n_rows = 5, make_proportional = TRUE) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  coord_equal() +
+  scale_x_continuous(labels = function(x) { paste0(x * 5, "%") }) +
+  labs(title = "Road accidents in Madrid in 2020",
+       fill = "sex",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: {CDR} package") +
+  theme_gg +
+  theme(axis.text.y = element_blank())
+```
+
+---
+
+## Waffle charts: a sweet solution
+
+
+:::: columns
+::: {.column width="50%"}
+
+Estos gráficos nos permiten realizar [**comparaciones "parte-del-todo"**]{.hl-green} mucho más sencillas. 
+
+:::
+
+::: {.column width="50%"}
+
+These charts make [**"part-to-whole" comparisons**]{.hl-green} much simpler.
+
+:::
+::::
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+ggplot(data |> filter(positiva_alcohol != "NULL" & sexo != "Unknown") |> 
+         mutate("positiva_alcohol" =
+                  if_else(positiva_alcohol == "S", "Alcohol yes",
+                          "Alcohol no")) |> 
+         count(sexo, positiva_alcohol) ) +
+  geom_waffle(aes(fill = sexo, values = n),
+              alpha = 0.7, color = "grey90", size = 0.2,
+              n_rows = 5, make_proportional = TRUE) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = 1) + 
+  coord_equal() +
+  scale_x_continuous(labels = function(x) { paste0(x * 5, "%") }) +
+  facet_wrap(~positiva_alcohol, nrow = 2, strip.position = "right") +
+  labs(title = "Road accidents in Madrid in 2020",
+       fill = "sex",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: {CDR} package") +
+  theme_gg +
+  theme(axis.text.y = element_blank())
+```
+
+
+
+
+---
+
+## Time waffle charts
+
+
+:::: columns
+::: {.column width="50%"}
+
+En datos más complejos nos permite, haciendo uso de `facet_wrap()`, visualizar la [**evolución temporal de las proporciones**]{.hl-green}.
+
+:::
+
+::: {.column width="50%"}
+
+For more complex data, using `facet_wrap()` allows us to visualize the [**time evolution of these proportions**]{.hl-green}.
+
+:::
+
+::::
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+ggplot(data |> 
+         mutate("month" = month(fecha, abbr = TRUE,
+                                label = TRUE),
+                "sexo" = factor(sexo, levels = c("Female", "Male", "Unknown"), ordered = TRUE)) |> 
+         summarise("avg_daily" = n()/31,
+                   .by = c(sexo, month)) |> 
+         arrange(month, sexo)) +
+  geom_waffle(aes(fill = sexo, values = avg_daily),
+              alpha = 0.7, color = "grey90", size = 0.2,
+              n_rows = 5, flip = TRUE) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = -1) +
+  scale_y_continuous(labels = function(x) x * 5, 
+                     expand = c(0, 0), n.breaks = 10) +
+  facet_wrap(~month, nrow = 1, strip.position = "bottom") +
+  coord_equal() +
+  labs(title = "Road accidents in Madrid in 2020",
+       subtitle = "Daily average of accidents by month",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: {CDR} package") +
+  theme_gg +
+  theme(axis.text.x = element_blank(),
+        strip.text.x =
+          element_text(size = 12, color = "grey30", face = "bold"))
+```
+
+---
+
+
+## In summary
+
+:::: columns
+::: {.column width="50%"}
+
+El paquete `{waffle}` nos pofrece una sencilla y flexible alternativa para cualitativas. Puedes ver más en <https://github.com/hrbrmstr/waffle>
+
+:::
+
+::: {.column width="50%"}
+
+The `{waffle}` package offers a simple and flexible alternative for quali variables. You can explore at <https://github.com/hrbrmstr/waffle>.
+
+:::
+::::
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+ggplot(data |> 
+         mutate("month" = month(fecha, abbr = TRUE,
+                                label = TRUE),
+                "sexo" = factor(sexo, levels = c("Female", "Male", "Unknown"), ordered = TRUE)) |> 
+         summarise("avg_daily" = n()/31,
+                   .by = c(sexo, month)) |> 
+         arrange(month, sexo)) +
+  geom_waffle(aes(fill = sexo, values = avg_daily),
+              alpha = 0.7, color = "grey90", size = 0.2,
+              n_rows = 5, flip = TRUE) +
+  MetBrewer::scale_fill_met_d("Renoir", direction = -1) +
+  scale_y_continuous(labels = function(x) x * 5, 
+                     expand = c(0, 0), n.breaks = 10) +
+  facet_wrap(~month, nrow = 1, strip.position = "bottom") +
+  coord_equal() +
+  labs(title = "Road accidents in Madrid in 2020",
+       subtitle = "Daily average of accidents by month",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: {CDR} package") +
+  theme_gg +
+  theme(axis.text.x = element_blank(),
+        strip.text.x =
+          element_text(size = 12, color = "grey30", face = "bold"))
+```
+
+
