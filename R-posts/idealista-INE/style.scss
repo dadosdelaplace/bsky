@@ -1,0 +1,135 @@
+
+/*-- scss:defaults --*/
+
+// general
+$body-color: #444442 !default;
+$presentation-font-size-root: 2em;
+$link-color: #917fb8 !default;
+
+
+// headings
+$h1-font-size: 3em !default;
+$h2-font-size: 2.1em !default;
+$h3-font-size: 1.7em !default;
+$h4-font-size: 1.5em !default;
+
+//code
+$code-color: #4cab7f !default; // #2F70AD
+$code-block-border-color: lighten($body-color, 30%) !default;
+$code-block-bg: #ffffff !default;
+
+.reveal pre.sourceCode code {
+    padding: 6px 9px !important;
+    max-height: 400px !important;
+    white-space: pre !important;
+}
+
+
+.reveal pre code {
+    display: block !important;
+    overflow: auto !important;
+    word-wrap: normal !important;
+    font-weight: 300 !important;
+    font-size: 1.1em !important;
+}
+
+
+
+
+code span.fu {
+  color: #917fb8 !important; // a1ffe2
+}
+
+code span.at {
+  color: #4cab7f !important; // #2972A8
+}
+
+code span.sc {
+  color: #ff5500 !important; // a1ffe2
+}
+
+code span.st {
+  color: #c4201d !important; // a1ffe2
+}
+
+code span.ot {
+  color: #2972A8 !important; // #30ad7e
+}
+
+
+/*-- scss:mixins --*/
+
+
+/*-- scss:rules --*/
+
+.title{
+  font-size: 3.1em !important;
+  font-weight: bold !important;
+}
+
+.reveal h1 {
+  font-size: 3.1em !important;
+  text-align: center !important;
+}
+
+.reveal h2 {
+  font-size: 2.1em !important;
+}
+
+.reveal code {
+    background-color: rgba(0,0,0,0);
+    white-space: pre-wrap !important;
+    font-weight: bold !important;
+}
+
+
+
+.hl-yellow{
+   background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    #F8DF58 40%
+  );
+}
+
+.hl-red{
+   background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    #EEB0B1 40%
+  );
+}
+
+.hl-purple{
+   background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    #CAB0EE 40%
+  );
+}
+
+.hl-green{
+   background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    #B0EED1 40%
+  );
+}
+
+
+.hl-orange{
+   background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    #EFD3A7 40%
+  );
+}
+
+
+
+
+
+
+
+
+

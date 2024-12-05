@@ -1,0 +1,750 @@
+---
+title: "`{idealista18}` repo and `{ineAtlas}` package"
+subtitle: "La crisis de la vivienda en España.\n The housing crisis in Spain"
+format:
+  revealjs:
+    theme: [style.scss]
+    menu:
+      side: left
+      width: normal
+    footer: "[<strong>Javier Álvarez Liébana</strong>](https://bsky.app/profile/dadosdelaplace.bsky.social) • @dadosdelaplace • dadosdelaplace.bsky.social"
+    slide-number: c/t
+execute:
+  echo: true
+---
+
+## Housing crisis in Spain
+
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| 
+library(idealista18)
+library(stars)
+library(sf)
+library(gstat)
+library(tidyverse)
+
+crs <- st_crs("EPSG:32632")
+grid_madrid <-
+  st_bbox(Madrid_Polygons|> st_transform(crs)) |>
+  st_as_stars(dx = 100) |>
+  st_crop(Madrid_Polygons|> st_transform(crs))
+interp_madrid <- idw(UNITPRICE ~ 1, Madrid_Sale |> st_transform(crs),
+                     grid_madrid)
+
+extrafont::loadfonts()
+theme_gg <-
+  theme_minimal(base_family = "Rockwell") +
+  theme(legend.position = "bottom", legend.title = element_blank(),
+        legend.text = element_text(size = 9, color = "grey20"),
+        plot.title = element_text(size = 21, face = "bold"),
+        plot.subtitle = element_text(size = 13),
+        axis.text = element_text(size = 9, color = "grey50"),
+        axis.text.x = element_text(size = 9, color = "grey50"),
+        axis.text.y = element_text(size = 9, color = "grey50"),
+        axis.title.x = element_blank(),
+        strip.text = element_text(size = 13),
+        panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
+ 
+ggplot() +
+  geom_stars(data = interp_madrid,
+             aes(fill = var1.pred, x = x, y = y)) +
+    geom_sf(data =
+              st_cast(Madrid_Polygons |> st_transform(crs), "MULTILINESTRING"), color = "grey20", linewidth = 0.15) + 
+  scale_fill_gradient2(low = "#b01f1d", mid = "white", high = "#1a4c6f",
+                       midpoint = median(Madrid_Sale$UNITPRICE),
+                       na.value = NA) +
+  labs(x = NULL, y = NULL, fill = "Asking price by sq meter",
+       title = "Asking price by sq meter (Madrid, 2018)",
+       subtitle = "Gradient designed based on median. Grid resolution: 100m",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo") +
+  theme_gg +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank(),
+        legend.title = element_text(size = 11, color = "grey20"))
+```
+
+---
+
+## idealista18 repo
+
+:::: columns
+::: {.column width="50%"}
+
+`{idealista18}` es un [**conjunto de datos abiertos**](https://journals.sagepub.com/doi/10.1177/23998083241242844) de anuncios inmobiliarios de 2018 en España, correspondientes a las tres ciudades más grandes: Madrid (n = 94 815), Barcelona (n = 61 486) y Valencia (n = 33 622).
+
+:::
+
+::: {.column width="50%"}
+
+`{idealista18}` is a set of [**open geo-referenced dataset**](https://journals.sagepub.com/doi/10.1177/23998083241242844) of 2018 real estate listings in Spain for the three largest cities in Spain: Madrid (n = 94 815 observations), Barcelona (n = 61 486), and Valencia (n = 33 622).
+:::
+::::
+
+```{r}
+#| eval: false
+devtools::install_github("paezha/idealista18")
+library(idealista18)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+library(idealista18)
+library(tidyverse)
+```
+
+---
+
+## idealista18 repo
+
+:::: columns
+::: {.column width="50%"}
+
+* [**Dwelling listings**]{.hl-yellow}: características de cada vivienda publicada como anuncio en el sitio web de Idealista.
+
+* [**Polígonos**]{.hl-yellow}: delimitaciones geográficas de los distritos
+
+* [**POIs**]{.hl-yellow}: un conjunto de puntos de interés en cada ciudad (coordenadas del centro de la ciudad, coordenadas de estaciones de metro, etc).
+
+
+:::
+
+::: {.column width="50%"}
+
+* [**Dwelling listings**]{.hl-yellow}: characteristics for each dwelling published on the idealista website as an ad.
+
+* [**Neighboorhood polygons**]{.hl-yellow}
+
+* [**Points of Interest (POIs)**]{.hl-yellow}: a set of Points of Interest in each city (coordinates of the city center, coordinates of the metro stations, etc).
+
+:::
+::::
+
+:::: columns
+::: {.column width="33%"}
+
+```{r}
+#| eval: false
+Madrid_Sale
+Barcelona_Sale
+Valencia_Sale
+```
+
+:::
+
+::: {.column width="33%"}
+
+```{r}
+#| eval: false
+Madrid_Polygons
+Barcelona_Polygons
+Valencia_Polygons
+```
+
+:::
+
+
+::: {.column width="33%"}
+
+```{r}
+#| eval: false
+Madrid_POIS
+Barcelona_POIS
+Valencia_POIS
+```
+
+:::
+
+::::
+
+---
+
+
+## idealista18 repo
+
+:::: columns
+::: {.column width="50%"}
+
+Los datos de viviendas están en formato `sf` pero podemos obtenerlos como tabla eliminando su geometría (paquete `{sf}`)
+
+:::
+
+::: {.column width="50%"}
+
+Dwelling data is provided as an `sf` object but we can obtain it as a tabular data just removing its geometry (`{sf}` package)
+
+:::
+::::
+
+
+```{r}
+# install.packages("sf")
+data <-
+  Madrid_Sale |>
+  sf::st_drop_geometry() |> 
+  as_tibble() 
+data
+```
+
+
+
+---
+
+## `{corrr}` package
+  
+  
+:::: columns
+::: {.column width="50%"}
+
+¿Qué [**correla más con el precio**]{.hl-yellow}? 
+
+:::
+
+::: {.column width="50%"}
+
+What [**correlates the most with the price**]{.hl-yellow}?
+
+:::
+::::
+
+
+  
+```{r}
+#| code-fold: true
+#| warning: false
+#| message: false
+#| fig-align: "center"
+library(idealista18)
+library(ggcorrplot)
+
+cor_madrid <-
+  Madrid_Sale |>
+  sf::st_drop_geometry() |> 
+  as_tibble() |> 
+  select(where(is.numeric), -PRICE) |> 
+  corrr::correlate() |> 
+  select(term, UNITPRICE) |> 
+  filter(term != "UNITPRICE") |> 
+  rename(correlation = UNITPRICE) |> 
+  filter(abs(correlation) > 0.15)
+
+ggplot(cor_madrid) +
+  geom_col(aes(x = correlation, y = term, fill = correlation,
+               alpha = abs(correlation))) +
+  scale_fill_gradient2(low = "#E46726", mid = "white", high = "#6D9EC1",
+                       midpoint = 0) +
+  scale_alpha_continuous(range = c(0.45, 0.95)) +
+  guides(alpha = "none") +
+  labs(x = "Correlation", y = "Variables", fill = "Correlation",
+       title = "Correlation analysis about Madrid",
+       subtitle = "Data for Madrid in 2018. Variables with correlation less than\n0.15 (in abs value) respect to price were removed",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo") +
+  theme_gg +
+  theme(legend.position = "right")
+```
+
+---
+
+## `{corrr}` package
+  
+  
+:::: columns
+::: {.column width="50%"}
+
+¿Qué [**correla más con el precio**]{.hl-yellow}? 
+
+:::
+
+::: {.column width="50%"}
+
+What [**correlates the most with the price**]{.hl-yellow}?
+
+:::
+::::
+
+  
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+cor_bcn <-
+  Barcelona_Sale |>
+  sf::st_drop_geometry() |> 
+  as_tibble() |> 
+  select(where(is.numeric), -PRICE) |> 
+  corrr::correlate() |> 
+  select(term, UNITPRICE) |> 
+  filter(term != "UNITPRICE") |> 
+  rename(correlation = UNITPRICE) |> 
+  filter(abs(correlation) > 0.1)
+
+ggplot(cor_bcn) +
+  geom_col(aes(x = correlation, y = term, fill = correlation,
+               alpha = abs(correlation))) +
+  scale_fill_gradient2(low = "#E46726", mid = "white", high = "#6D9EC1",
+                       midpoint = 0) +
+  scale_alpha_continuous(range = c(0.45, 0.95)) +
+  guides(alpha = "none") +
+  labs(x = "Correlation", y = "Variables", fill = "Correlation",
+       title = "Correlation analysis about Barcelona",
+       subtitle = "Data for Barcelona in 2018. Variables with correlation less than\n0.1 (in abs value) respect to price were removed",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo") +
+  theme_gg +
+  theme(legend.position = "right")
+```
+
+---
+
+## `{corrr}` package
+  
+  
+:::: columns
+::: {.column width="50%"}
+
+¿Qué [**correla más con el precio**]{.hl-yellow}? 
+
+:::
+
+::: {.column width="50%"}
+
+What [**correlates the most with the price**]{.hl-yellow}?
+
+:::
+::::
+
+
+  
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+cor_vlc <-
+  Valencia_Sale |>
+  sf::st_drop_geometry() |> 
+  as_tibble() |> 
+  select(where(is.numeric), -PRICE) |> 
+  corrr::correlate() |> 
+  select(term, UNITPRICE) |> 
+  filter(term != "UNITPRICE") |> 
+  rename(correlation = UNITPRICE) |> 
+  filter(abs(correlation) > 0.15)
+
+ggplot(cor_vlc) +
+  geom_col(aes(x = correlation, y = term, fill = correlation,
+               alpha = abs(correlation))) +
+  scale_fill_gradient2(low = "#E46726", mid = "white", high = "#6D9EC1",
+                       midpoint = 0) +
+  scale_alpha_continuous(range = c(0.45, 0.95)) +
+  guides(alpha = "none") +
+  labs(x = "Correlation", y = "Variables", fill = "Correlation",
+       title = "Correlation analysis about Valencia",
+       subtitle = "Data for Valencia in 2018. Variables with correlation less than\n0.15 (in abs value) respect to price were removed",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo") +
+  theme_gg +
+  theme(legend.position = "right")
+```
+
+
+---
+
+
+## `{ggcorrplot}` package
+  
+  
+:::: columns
+::: {.column width="50%"}
+
+El paquete `{ggcorrplot}` nos **visualiza la matriz de correlaciones**.
+
+:::
+
+::: {.column width="50%"}
+
+The `{ggcorrplot}` package visualizes the **correlation matrix**.
+
+:::
+::::
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+#| fig-height: 6
+data <-
+  Madrid_Sale |>
+  sf::st_drop_geometry() |> 
+  as_tibble() |> 
+  mutate("city" = "Madrid") |> 
+  bind_rows(Barcelona_Sale |>
+              sf::st_drop_geometry() |> 
+              as_tibble() |> 
+              mutate("city" = "Barcelona")) |> 
+  bind_rows(Valencia_Sale |>
+              sf::st_drop_geometry() |> 
+              as_tibble() |> 
+              mutate("city" = "Valencia"))
+
+list_cor_var_madrid <-
+  data |> 
+  filter(city == "Madrid") |> 
+  select(where(is.numeric), -PRICE) |> 
+  corrr::correlate() |> 
+  select(term, UNITPRICE) |> 
+  drop_na(UNITPRICE) |> 
+  filter(abs(UNITPRICE) >= 0.15) |> 
+  pull(term)
+
+gg1 <-
+  ggcorrplot(data |>
+               filter(city == "Madrid") |> 
+               select(UNITPRICE, list_cor_var_madrid) |> 
+               cor(),
+             outline.col = "grey90",
+             ggtheme = theme_gg,
+             colors = c("#6D9EC1", "white", "#E46726"),
+             tl.cex = 7) +
+  labs(title = "Correlation analysis about Madrid",
+       subtitle = "Data for Madrid in 2018. Variables with correlation less than\n0.15 (in abs value) respect to price (by sq meters) were removed",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo") +
+  theme(plot.title.position = "plot", legend.position = "right")
+gg1
+```
+
+---
+
+## `{ggcorrplot}` package
+  
+  
+:::: columns
+::: {.column width="50%"}
+
+El paquete `{ggcorrplot}` nos **visualiza la matriz de correlaciones**.
+
+:::
+
+::: {.column width="50%"}
+
+The `{ggcorrplot}` package visualizes the **correlation matrix**.
+
+:::
+::::
+
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+#| fig-height: 6
+list_cor_var_bcn <-
+  data |> 
+  filter(city == "Barcelona") |> 
+  select(where(is.numeric), -PRICE) |> 
+  corrr::correlate() |> 
+  select(term, UNITPRICE) |> 
+  drop_na(UNITPRICE) |> 
+  filter(abs(UNITPRICE) >= 0.1) |> 
+  pull(term)
+
+gg2 <-
+  ggcorrplot(data |>
+               filter(city == "Barcelona") |> 
+               select(UNITPRICE, list_cor_var_bcn) |> 
+               cor(),
+             outline.col = "grey90",
+             ggtheme = theme_gg,
+             colors = c("#6D9EC1", "white", "#E46726"),
+             tl.cex = 7) +
+  labs(title = "Correlation analysis about Barcelona",
+       subtitle = "Data for Barcelona in 2018. Variables with correlation less than\n0.15 (in abs value) respect to price (by sq meters) were removed",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo") +
+  theme(plot.title.position = "plot", legend.position = "right")
+gg2
+```
+
+---
+
+## `{ggcorrplot}` package
+  
+  
+:::: columns
+::: {.column width="50%"}
+
+El paquete `{ggcorrplot}` nos **visualiza la matriz de correlaciones**.
+
+:::
+
+::: {.column width="50%"}
+
+The `{ggcorrplot}` package visualizes the **correlation matrix**.
+
+:::
+::::
+
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+#| fig-height: 6
+list_cor_var_vlc <-
+  data |> 
+  filter(city == "Valencia") |> 
+  select(where(is.numeric), -PRICE) |> 
+  corrr::correlate() |> 
+  select(term, UNITPRICE) |> 
+  drop_na(UNITPRICE) |> 
+  filter(abs(UNITPRICE) >= 0.1) |> 
+  pull(term)
+
+gg3 <-
+  ggcorrplot(data |>
+               filter(city == "Valencia") |> 
+               select(UNITPRICE, list_cor_var_vlc) |> 
+               cor(),
+             outline.col = "grey90",
+             ggtheme = theme_gg,
+             colors = c("#6D9EC1", "white", "#E46726"),
+             tl.cex = 7) +
+  labs(title = "Correlation analysis about Valencia",
+       subtitle = "Data for Valencia in 2018. Variables with correlation less than\n0.15 (in abs value) respect to price (by sq meters) were removed",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo") +
+  theme(plot.title.position = "plot", legend.position = "right")
+gg3
+```
+
+
+---
+
+## Price vs distance to center
+
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+data |>
+  mutate("z_scores_distance" = outliers::scores(DISTANCE_TO_CITY_CENTER),
+         "z_scores_price" = outliers::scores(UNITPRICE),
+         .by = city) |> 
+  filter(abs(z_scores_distance) <= 2 & abs(z_scores_price) <= 2) |>
+  ggplot(aes(x = DISTANCE_TO_CITY_CENTER, y = UNITPRICE)) +
+  geom_point(aes(size = UNITPRICE, color = UNITPRICE),
+             alpha = 0.25) +
+  geom_smooth(se = FALSE, color = "grey30", linewidth = 1.5) +
+  MetBrewer::scale_color_met_c(palette_name = "Renoir") +
+  scale_size_continuous(range = c(0.2, 1.5)) +
+  facet_wrap(~city, scales = "free") +
+  guides(size = "none") +
+  labs(title = "Price (by sq meter) vs distance to center (2018)",
+       subtitle = "Outliers were removed in both variables (absolute value greater than 2 sd respect to the mean)",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo",
+       y = "Unit price (sq mt)", color = "Distance to center (km)") +
+  theme_gg +
+  theme(legend.title = element_text(size = 11, color = "grey20"))
+```
+
+
+---
+
+## Price vs distance to metro
+
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+data |>
+  mutate("z_scores_distance_metro" = outliers::scores(DISTANCE_TO_METRO),
+         "z_scores_price" = outliers::scores(UNITPRICE),
+         .by = city) |> 
+  filter(abs(z_scores_distance_metro) <= 2 & abs(z_scores_price) <= 2) |>
+  ggplot(aes(x = DISTANCE_TO_METRO, y = UNITPRICE)) +
+  geom_point(aes(size = UNITPRICE, color = UNITPRICE),
+             alpha = 0.25) +
+  geom_smooth(se = FALSE, color = "grey30", linewidth = 1.5) +
+  MetBrewer::scale_color_met_c(palette_name = "Renoir") +
+  scale_size_continuous(range = c(0.2, 1.5)) +
+  facet_wrap(~city, scales = "free") +
+  guides(size = "none")  +
+  labs(title = "Price (by sq meter) vs distance to metro (2018)",
+       subtitle = "Outliers were removed in both variables (absolute value greater than 2 sd respect to the mean)",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo",
+       y = "Unit price (sq mt)", color = "Distance to metro (km)") +
+  theme_gg +
+  theme(legend.title = element_text(size = 11, color = "grey20"))
+```
+
+---
+
+## Years to pay
+
+:::: columns
+::: {.column width="50%"}
+
+Cruzando con datos del INE (paquete `{ineAtlas}`) podemos calcular el [**número de años necesarios que se necesitaban para una vivienda**]{.hl-yellow}.
+
+:::
+
+::: {.column width="50%"}
+
+By combining it with data from INE (`{ineAtlas}` package), we can calculate the [**number of years required in 2018 to pay**]{.hl-yellow}.
+
+:::
+::::
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+library(ineAtlas)
+library(mapSpain)
+INE_mad_district <-
+  get_atlas(category = "income", level = "district") |> 
+  filter(year == 2018 & mun_name == "Madrid") |> 
+  mutate("id_district" = str_remove(district_code, "28079")) |> 
+  select(id_district, net_income_pc)
+
+INE_bcn_district <-
+  get_atlas(category = "income", level = "district") |> 
+  filter(year == 2018 & mun_name == "Barcelona") |> 
+  mutate("id_district" = str_remove(district_code, "08019")) |> 
+  select(id_district, net_income_pc)
+
+INE_vlc_district <-
+  get_atlas(category = "income", level = "district") |> 
+  filter(year == 2018 & mun_name == "València") |> 
+  mutate("id_district" = str_remove(district_code, "46250")) |> 
+  select(id_district, net_income_pc)
+
+
+Madrid_Polygons_district <-
+  Madrid_Polygons |> 
+    mutate(id_district =
+               str_sub(str_remove(LOCATIONID, "0-EU-ES-28-07-001-079-"),
+                       start = 1, end = 2)) |> 
+    group_by(id_district) |> summarise()
+Barcelona_Polygons_district <-
+  Barcelona_Polygons |> 
+    mutate(id_district =
+               str_sub(str_remove(LOCATIONID, "0-EU-ES-08-13-001-019-"),
+                       start = 1, end = 2)) |> 
+    group_by(id_district) |> summarise()
+Valencia_Polygons_district <-
+  Valencia_Polygons |> 
+    mutate(id_district =
+               str_sub(str_remove(LOCATIONID, "0-EU-ES-46-02-002-250-"),
+                       start = 1, end = 2)) |> 
+    group_by(id_district) |> summarise()
+
+Madrid_sale_district <-
+  Madrid_Sale |> 
+  st_intersection(Madrid_Polygons_district) |> 
+  as_tibble() |> 
+  summarise("mean_price" = mean(UNITPRICE), .by = id_district)
+
+Barcelona_sale_district <-
+  Barcelona_Sale |> 
+  st_intersection(Barcelona_Polygons_district) |> 
+  as_tibble() |> 
+  summarise("mean_price" = mean(UNITPRICE), .by = id_district)
+
+Valencia_sale_district <-
+  Valencia_Sale |> 
+  st_intersection(Valencia_Polygons_district) |> 
+  as_tibble() |> 
+  summarise("mean_price" = mean(UNITPRICE), .by = id_district)
+
+Madrid_data <-
+  Madrid_Polygons_district |> 
+  left_join(Madrid_sale_district |>
+              inner_join(INE_mad_district, by = "id_district") |>
+              mutate("lifes" = mean_price * 80 / net_income_pc),
+            by = "id_district")
+Barcelona_data <-
+  Barcelona_Polygons_district |> 
+  left_join(Barcelona_sale_district |>
+              inner_join(INE_bcn_district, by = "id_district") |>
+              mutate("lifes" = mean_price * 80 / net_income_pc),
+            by = "id_district")
+Valencia_data <-
+  Valencia_Polygons_district |> 
+  left_join(Valencia_sale_district |>
+              inner_join(INE_vlc_district, by = "id_district") |>
+              mutate("lifes" = mean_price * 80 / net_income_pc),
+            by = "id_district")
+
+map_1 <- ggplot(Madrid_data) +
+  geom_sf(aes(fill = lifes), color = NA) + 
+  scale_fill_gradient2(low = "#b01f1d", mid = "white", high = "#1a4c6f",
+                       midpoint = mean(Madrid_data$lifes),
+                       na.value = NA) +
+  labs(x = NULL, y = NULL, fill = "Years to pay",
+       subtitle = "Madrid") +
+  theme_gg +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank(),
+        legend.title = element_text(size = 11, color = "grey20"))
+
+map_2 <- ggplot(Barcelona_data) +
+  geom_sf(aes(fill = lifes), color = NA) + 
+  scale_fill_gradient2(low = "#b01f1d", mid = "white", high = "#1a4c6f",
+                       midpoint = mean(Barcelona_data$lifes),
+                       na.value = NA) +
+  labs(x = NULL, y = NULL, fill = "Years to pay",
+       subtitle = "Barcelona") +
+  theme_gg +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank(),
+        legend.title = element_text(size = 11, color = "grey20"))
+
+map_3 <- ggplot(Valencia_data) +
+  geom_sf(aes(fill = lifes), color = NA) + 
+  scale_fill_gradient2(low = "#b01f1d", mid = "white", high = "#1a4c6f",
+                       midpoint = mean(Valencia_data$lifes),
+                       na.value = NA) +
+  labs(x = NULL, y = NULL, fill = "Years to pay",
+       subtitle = "Valencia") +
+  theme_gg +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank(),
+        legend.title = element_text(size = 11, color = "grey20"))
+
+library(patchwork)
+(map_1 + map_2 + map_3) &
+  plot_annotation(title = "How many lifes we needed to pay for a flat? (2018)",
+                  subtitle = "Ratio between mean asking prices (80m2 flat) and net average income by person assuming that 100% of \nincome is used to pay the mortgage (interest generated by it has not been taken into account)",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo and {ineAtlas} package",
+                  theme = theme_gg)
+```
+
+
+---
+
+
+## In summary
+
+:::: columns
+::: {.column width="50%"}
+
+La combinación de `{idealista18}`, `{ineAtlas}` y `{mapSpain}` nos permite realizar análisis simple del mercado de la vivienda en España
+
+:::
+
+::: {.column width="50%"}
+
+The combination of `{idealista18}`, `{ineAtlas}`, and `{mapSpain}` allows us to perform a simple analysis of the housing market in Spain.
+
+:::
+::::
+
+```{r}
+#| echo: false
+#| fig-align: "center"
+(map_1 + map_2 + map_3) &
+  plot_annotation(title = "How many lifes we needed to pay for a flat? (2018)",
+                  subtitle = "Ratio between mean asking prices (80m2 flat) and net average income by person assuming that 100% of \nincome is used to pay the mortgage (interest generated by it has not been taken into account)",
+                  caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: idealista18 Github Repo and {ineAtlas} package",
+                  theme = theme_gg)
+```
+
+
