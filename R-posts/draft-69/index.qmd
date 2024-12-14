@@ -1,0 +1,370 @@
+---
+title: "`Draft 69`"
+subtitle: "La historia de cómo un mal sorteo te puede mandar a la guerra. The story of how an unfair draw can send you to war"
+format:
+  revealjs:
+    theme: [style.scss]
+    menu:
+      side: left
+      width: normal
+    footer: "[<strong>Javier Álvarez Liébana</strong>](https://bsky.app/profile/dadosdelaplace.bsky.social) • @dadosdelaplace • dadosdelaplace.bsky.social"
+    slide-number: c/t
+execute:
+  echo: true
+---
+
+## Draft 69
+
+:::: columns
+::: {.column width="37%"}
+
+🗺 In 1955, the U.S. embarked on the [**Vietnam War**]{.hl-green}, a war that would last for more than 20 years. As recruitment increased, protests began: they were not only against the war itself but also against the [**Draft, an opaque, biased, and racist selection process**]{.hl-green}.
+
+[**Fact**]{.hl-yellow}: until 1967, more than 60% of those drafted were Black people, despite making up only 30% of the population to be recruited.
+
+:::
+
+::: {.column width="63%"}
+
+```{r}
+library(tidyverse)
+draft_69 <-
+  read_csv(file = "https://raw.githubusercontent.com/dadosdelaplace/hilostwitter/main/R/%23matesendomingo/2021_07_27_DRAFT_LOTTERY_VIETNAM/draft_data.csv") |> 
+  select(M, D, N69) |>
+  rename(month = M, day = D, ballot = N69) |> 
+  rowid_to_column(var = "annual_day") |> 
+  mutate(month =
+           factor(month, levels = 1:12, ordered = TRUE,
+                  labels = c("Jan", "Feb", "Mar", "Apr",
+                             "May", "Jun", "Jul", "Aug",
+                             "Sep", "Oct", "Nov", "Dec")))
+draft_69
+```
+
+:::
+::::
+
+---
+
+## Draft 69
+
+:::: columns
+::: {.column width="64%"}
+
+🗳 To quell criticism of the biased process (as 40 000 recruits were needed each month), President Johnson decided to implement a [**lottery-based draft (the first since World War II): the 1969 Vietnam "Draft Lottery"**]{.hl-green}
+
+🙋 Candidates: men born between 1944 and 1950
+
+🔢 Structure: 366 slots (gaps on a list) to be filled
+
+📆 Process: 366 strips of paper, each representing a day of the year, were written and mixed
+
+🔀 Selection: dates were drawn one by one and assigned to the slots
+
+&nbsp;
+
+🕵 Was it truly fair?️
+
+:::
+
+::: {.column width="36%"}
+
+![](./img-1.jpeg)
+
+![](./img-2.jpeg)
+
+:::
+::::
+
+
+---
+
+## How were ballots distributed?
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+extrafont::loadfonts()
+theme_gg <-
+  theme_minimal(base_family = "Rockwell") +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 13, color = "grey20"),
+        plot.title = element_text(size = 21, face = "bold"),
+        axis.text = element_text(size = 13, color = "grey50"),
+        axis.title = element_text(size = 15),
+        strip.text = element_text(size = 15),
+        panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
+```
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+ggplot(draft_69, aes(x = annual_day, y = ballot, color = month)) +
+  geom_vline(xintercept = cumsum(c(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)),
+             linewidth = 0.65, linetype = 6, color = "grey40") +
+  geom_hline(yintercept = 195, linewidth = 0.1, linetype = 5, color = "grey50") +
+  geom_point(aes(alpha = ballot <= 195), size = 3.7) +
+  geom_smooth(se = FALSE, color = "grey30", linewidth = 1.1) +
+  scale_alpha_manual(values = c(0.15, 0.85)) +
+  scale_x_continuous(breaks = cumsum(c(0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)), limits = c(0, 435)) +
+  MetBrewer::scale_color_met_d(palette_name = "Renoir") +
+  guides(alpha = "none", color = guide_legend(nrow = 1)) +
+  annotate(geom = "text", x = 372, y = 195 - 32,
+           label = "Ballots below 195\nhad to go to war", size = 3.7,
+           color = "#d4433c", hjust = "left", family = "Rockwell",
+           fontface = "bold") +
+   annotate(geom = "text", x = 372, y = 195 + 32,
+           label = "Ballots above 195 did\nnot have to go to war", size = 3.7,
+           color = "#338972", hjust = "left", family = "Rockwell",
+           fontface = "bold") +
+  labs(x = "Day of birth (annual)", title = "Draft 69: who was recruited?",
+       subtitle = "Ballots from 1 to 366. Recruited as solid color. Line fitted as loess regression",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: https://www.randomservices.org/random/data/Draft.html") +
+  theme_gg +
+  theme(legend.title = element_blank())
+```
+
+
+🪖 Men born between 1944 and 1950 on the days corresponding to the [**first 195 dates drawn would be drafted**]{.hl-green} for the war.
+
+🕵 Is there the [**same % of ballots below 195 in each month**]{.hl-yellow}?
+
+
+---
+
+## How were ballots distributed?
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+ggplot(draft_69 |>
+         summarise("yes" = sum(ballot <= 195), "non" = n() - yes, "exp_prop" = (195/366),
+                   .by = month) |> 
+         pivot_longer(cols = c("yes", "non"), names_to = "recruited", values_to = "ballots")) +
+  geom_col(aes(x = month, y = ballots, fill = recruited),
+           position = "fill", alpha = 0.6) +
+  geom_hline(aes(yintercept = exp_prop), linewidth = 0.95, linetype = 6,
+             color = "grey30") +
+  MetBrewer::scale_fill_met_d(palette_name = "Renoir")  +
+  labs(y = "% people born in each month",
+       x = "month", fill = "Recruited?",
+       title = "Draft 69: who was recruited?",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: https://www.randomservices.org/random/data/Draft.html") +
+  coord_cartesian(xlim = c(1, 13.1), clip = "off") +
+  annotate(geom = "text", x = 12.52, y = 195/366 + 0.08,
+           label = "Expected\nproportion", size = 4,
+           color = "#338972", hjust = "left", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 1, y = 1.1,
+           label = "Avg ballot\n201.16", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 2, y = 1.1,
+           label = "202.97", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 3, y = 1.1,
+           label = "225.81", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 4, y = 1.1,
+           label = "203.67", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 5, y = 1.1,
+           label = "207.97", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 6, y = 1.1,
+           label = "195.73", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 7, y = 1.1,
+           label = "181.55", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 8, y = 1.1,
+           label = "173.45", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 9, y = 1.1,
+           label = "157.30", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 10, y = 1.1,
+           label = "182.45", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 11, y = 1.1,
+           label = "148.73", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  annotate(geom = "text", x = 12, y = 1.1,
+           label = "121.55", size = 3.5,
+           color = "grey30", hjust = "center", family = "Rockwell",
+           fontface = "bold") +
+  theme_gg
+```
+
+While in January, people born on 17 dates were spared from being drafted, in [**December only 5 dates were spared**]{.hl-green}
+
+---
+
+## How were ballots distributed?
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+
+# lollipop prop
+ggplot(draft_69 |>
+         summarise("prop" = sum(ballot <= 195)/n(),
+                   "prop_exp" = (195/366),
+                   .by = month),
+       aes(color = month, fill = month)) +
+  geom_point(aes(x = prop, y = month), size = 5) +
+  geom_segment(aes(x = prop_exp, xend = prop, y = month, yend = month),
+               linewidth = 1.2) +
+  MetBrewer::scale_color_met_d(palette_name = "Renoir") +
+  MetBrewer::scale_fill_met_d(palette_name = "Renoir") +
+  scale_x_continuous(breaks = sort(c(seq(0.4, 0.85, by = 0.05))),
+                     limits = c(0.4, 0.85), labels = scales::label_percent()) +
+  guides(fill = guide_legend(nrow = 1), color = guide_legend(nrow = 1)) +
+  labs(x = "Percentage of people recruited",
+       title = "Draft 69: who was recruited?",
+       subtitle = "Lollipop baseline based on expected proportion (0.5328)",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: https://www.randomservices.org/random/data/Draft.html") +
+  theme_gg +
+  theme(legend.title = element_blank())
+```
+
+[**Practically all those born in December (1944-1950) ended up on the war (83.87%)!**]{.hl-red}
+ 
+---
+
+
+## A pattern between ballots and dates?
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+
+# lollipop prop
+ggplot(draft_69 |>
+           summarise("avg_ballot" = mean(ballot <= 195),
+                     .by = month),
+       aes(x = month, y = avg_ballot)) +
+  geom_point(aes(color = month), size = 7, alpha = 0.75) +
+  geom_line(aes(x = as.numeric(month),
+                y = lm(avg_ballot ~ as.numeric(month))$fitted.values),
+            show.legend = FALSE, linetype = 6, size = 0.8, color = "grey30") +
+  MetBrewer::scale_color_met_d(palette_name = "Renoir") +
+  scale_y_continuous(labels = scales::label_percent()) +
+  guides(fill = guide_legend(nrow = 1), color = guide_legend(nrow = 1)) +
+  labs(x = "Month", y = "Percentage of people recruited",
+       title = "Draft 69: who was recruited?",
+       subtitle = "Linear fit of avg nº of ballot: 229.366 - 7.052*month. Godness-of-fit (R2): 0.7506",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: https://www.randomservices.org/random/data/Draft.html") +
+  theme_gg +
+  theme(legend.title = element_blank())
+
+```
+
+
+---
+
+## Was it chance?
+
+
+```{r}
+#| code-fold: true
+#| fig-align: "center"
+set.seed(12345)
+
+n_boots <- 5e3 
+sim_drafts <- 
+  tibble("month" = rep(draft_69$month, n_boots),
+         "sim_ballot" =
+           replicate(n = n_boots, sample(1:366, size = 366, replace = FALSE)) |> 
+           as.numeric(),
+         "id_sim" = rep(1:n_boots, 366))
+  
+desv_ballots <-
+  draft_69 |>
+  summarise("avg_ballot" = mean(ballot), .by = month) |>
+  summarise("desv_abs" = sum(abs(avg_ballot - mean(draft_69$ballot))))
+
+desv_ballots_sim <-
+  sim_drafts |> 
+  summarise("avg_ballot" = mean(sim_ballot), .by = c(month, id_sim)) |> 
+  mutate("desv_abs_simul" = abs(avg_ballot - mean(draft_69$ballot))) |> 
+  summarize("sum_desv_abs_simul" = sum(desv_abs_simul), .by = id_sim)
+
+quantile_draft_69 <- 
+  ecdf(desv_ballots_sim$sum_desv_abs_simul)(desv_ballots$desv_abs)
+
+library(ggdist)
+ggplot(desv_ballots_sim) +
+  stat_halfeye(aes(x = sum_desv_abs_simul),
+               fill = "#338972", alpha = 0.25, width = .6,
+               interval_size = 1.5) +
+               # adjust = 0.5, , .width = 0,
+               # justification = -0.3, point_colour = NA,
+               # shape = 18, point_size = 3) +
+  geom_jitter(aes(y = -0.4, x = sum_desv_abs_simul, color = sum_desv_abs_simul),
+              size = 2, alpha = 0.4, width = 0.1, height = 0.3) +
+  geom_point(x = desv_ballots$desv_abs, y = -0.28,
+             size = 5, color = "#d4433c", alpha = 0.4) +
+  geom_vline(xintercept = desv_ballots$desv_abs - 3.5,
+             linewidth = 0.6, linetype = 6, color = "#d4433c") +
+  scale_color_distiller(palette = "RdYlBu") +
+  annotate(geom = "text",
+           x = desv_ballots$desv_abs - 217, y = 0.65,
+           label = glue::glue("Bootstrap based on {n_boots} replicates.\n Draft 69 percentile: {round(100*quantile_draft_69, 5)}%"),
+           color = "#338972", hjust = "left", family = "Rockwell",
+           fontface = "bold", size = 3.3) +
+  annotate(geom = "text",
+          x = desv_ballots$desv_abs - 75, y = 0.93,
+          label =
+            paste0("Out of every 1000 draws,\n",
+                   "982 would obtain a smaller\n",
+                   "dev than the Draft 69"),
+          color = "#d4433c", hjust = "left", family = "Rockwell",
+          fontface = "bold", size = 3.3) +
+  annotate(geom = "text",
+           x = desv_ballots$desv_abs - 2, y = 0.27,
+           label = paste0("Draft 69 results were highly\n",
+                           "improbable (to be random)"),
+           color = "grey40", hjust = "left", family = "Rockwell",
+           fontface = "bold", size = 3.3) +
+  labs(x = "Sum of abs deviations", y = "Number of times",
+       color = "Abs dev",
+       title = "Draft 69: who was recruited?",
+       caption = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: https://www.randomservices.org/random/data/Draft.html") +
+  theme_gg +
+  theme(legend.text = element_text(size = 9, color = "grey20"),
+        legend.position = "right")
+```
+
+---
+
+## In summary
+
+A bad-designed draw in selection processes can be terrible consequences
+
+```{r}
+#| code-fold: true
+library(calendR)
+calendR(year = 1968, font.family = "Rockwell",
+        title = "Draft 69: who was recruited?",
+        subtitle = "@dadosdelaplace | @dadosdelaplace.bsky.social | Source: https://www.randomservices.org/random/data/Draft.html",
+        title.size = 21,
+        subtitle.size = 11, subtitle.col = "black", bg.col = "white",
+        start = "M", title.col = "grey20", col = "grey60",
+        special.days = draft_69$annual_day[draft_69$ballot <= 195],
+        special.col = c("#d4433c")) 
+```
+
